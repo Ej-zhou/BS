@@ -90,3 +90,28 @@ Num. neutral: 0 0.0
 
 ```
 
+
+
+
+
+```
+Evaluating:
+Input: data/crows_pairs_trimmed.csv
+Model: xlm-roberta
+====================================================================================================
+Some weights of the model checkpoint at xlm-roberta-base were not used when initializing XLMRobertaForMaskedLM: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+- This IS expected if you are initializing XLMRobertaForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing XLMRobertaForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+  0% 0/1042 [00:00<?, ?it/s]/usr/local/lib/python3.10/dist-packages/torch/__init__.py:696: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+100% 1042/1042 [09:02<00:00,  1.92it/s]
+====================================================================================================
+Total examples: 1042
+Metric score: 55.66
+Stereotype score: 55.18
+Anti-stereotype score: 58.28
+Num. neutral: 0 0.0
+====================================================================================================
+
+```
+
