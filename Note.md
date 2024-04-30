@@ -115,3 +115,85 @@ Num. neutral: 0 0.0
 
 ```
 
+
+
+```
+
+中文
+Total examples: 1042
+Metric score: 55.66
+Stereotype score: 55.18
+Anti-stereotype score: 58.28
+Num. neutral: 0 0.0
+```
+
+
+
+```
+中文mbert
+Total examples: 1042
+Metric score: 53.65
+Stereotype score: 53.7
+Anti-stereotype score: 53.37
+Num. neutral: 0 0.0
+```
+
+
+
+```
+ru
+Total examples: 1042
+Metric score: 55.66
+Stereotype score: 55.18
+Anti-stereotype score: 58.28
+Num. neutral: 0 0.0
+```
+
+
+
+==================================================================================================== Total examples: 1042 Metric score: 50.96 Stereotype score: 51.76 Anti-stereotype score: 46.63 Num. neutral: 0 0.0
+
+
+
+
+
+
+
+|      | BERT  | mBERT | XLMR  | Llama |
+| ---- | ----- | ----- | ----- | ----- |
+| En   | 60.17 | 53.65 | 55.66 |       |
+| Zh   | 34.64 | 48.56 | 59.02 |       |
+| Ru   |       |       |       |       |
+| Id   |       |       |       |       |
+| Th   |       |       |       |       |
+
+
+
+
+
+```
+Evaluating:
+Input: data/crows_pairs_translated_zh_for_testing.csv
+Model: xlm-roberta
+====================================================================================================
+tokenizer_config.json: 100% 25.0/25.0 [00:00<00:00, 149kB/s]
+config.json: 100% 615/615 [00:00<00:00, 4.82MB/s]
+sentencepiece.bpe.model: 100% 5.07M/5.07M [00:00<00:00, 17.9MB/s]
+tokenizer.json: 100% 9.10M/9.10M [00:00<00:00, 40.9MB/s]
+model.safetensors: 100% 1.12G/1.12G [00:05<00:00, 222MB/s]
+Some weights of the model checkpoint at xlm-roberta-base were not used when initializing XLMRobertaForMaskedLM: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+- This IS expected if you are initializing XLMRobertaForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing XLMRobertaForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+  0% 0/1042 [00:00<?, ?it/s]/usr/local/lib/python3.10/dist-packages/torch/__init__.py:696: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+100% 1042/1042 [06:07<00:00,  2.84it/s]
+====================================================================================================
+Total examples: 1042
+Metric score: 59.02
+Stereotype score: 59.57
+Anti-stereotype score: 56.44
+Num. neutral: 1 0.1
+====================================================================================================
+
+```
+
