@@ -12,7 +12,7 @@ import pandas as pd
 from transformers import BertTokenizer, BertForMaskedLM
 from transformers import AlbertTokenizer, AlbertForMaskedLM
 from transformers import RobertaTokenizer, RobertaForMaskedLM
-from transformers import AutoTokenizer, AutoModelForMaskedLM
+# from transformers import AutoTokenizer, AutoModelForMaskedLM
 from collections import defaultdict
 from tqdm import tqdm
 
