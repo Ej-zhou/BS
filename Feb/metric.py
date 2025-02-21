@@ -16,39 +16,6 @@ from transformers import RobertaTokenizer, RobertaForMaskedLM
 from collections import defaultdict
 from tqdm import tqdm
 
-# modified because python 3.9 does not support .append() with dictionaries
-
-# def read_data(input_file):
-#     """
-#     Load data into pandas DataFrame format.
-#     """
-    
-#     df_data = pd.DataFrame(columns=['sent1', 'sent2', 'direction', 'bias_type'])
-
-#     with open(input_file) as f:
-#         reader = csv.DictReader(f)
-#         for row in reader:
-#             direction, gold_bias = '_', '_'
-#             direction = row['stereo_antistereo']
-#             bias_type = row['bias_type']
-
-#             sent1, sent2 = '', ''
-#             if direction == 'stereo':
-#                 sent1 = row['sent_more']
-#                 sent2 = row['sent_less']
-#             else:
-#                 sent1 = row['sent_less']
-#                 sent2 = row['sent_more']
-
-#             df_item = {'sent1': sent1,
-#                        'sent2': sent2,
-#                        'direction': direction,
-#                        'bias_type': bias_type}
-#             df_data = df_data.append(df_item, ignore_index=True)
-
-#     return df_data
-
-
 def read_data(input_file):
     """
     Load data into pandas DataFrame format.
@@ -298,14 +265,6 @@ def evaluate(args):
                 sent_more_score = score['sent2_score']
                 sent_less_score = score['sent1_score']
 
-            # df_score = df_score.append({'sent_more': sent_more,
-            #                             'sent_less': sent_less,
-            #                             'sent_more_score': sent_more_score,
-            #                             'sent_less_score': sent_less_score,
-            #                             'score': pair_score,
-            #                             'stereo_antistereo': direction,
-            #                             'bias_type': bias
-            #                           }, ignore_index=True)
 
             # Create a DataFrame with the new row
             new_row = pd.DataFrame({'sent_more': [sent_more],
