@@ -165,7 +165,9 @@ def mask_unigram(data, lm, n=1):
     assert len(template1) == len(template2)
 
     N = len(template1)  # num. of tokens that can be masked
+    print("mask_token is", mask_token)
     mask_id = tokenizer.convert_tokens_to_ids(mask_token)
+    print("mask_id is", mask_id)
     
     sent1_log_probs = 0.
     sent2_log_probs = 0.
@@ -247,18 +249,28 @@ def evaluate(args):
         tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-560m")
         model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-560m")
         uncased = False
-
+    elif args.lm_model == 'xglm':
+        tokenizer = AutoTokenizer.from_pretrained("facebook/xglm-564M")
+        model = AutoModelForCausalLM.from_pretrained("facebook/xglm-564M")
+        uncased = False
+    elif args.lm_model == 'qwen':
+        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+        model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B")
+        uncased = False
+    elif args.lm_model == 'llama3':
+        tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B")
+        model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B")
+        uncased = False
+    
     model.eval()
     if torch.cuda.is_available():
-        # if(args.lm_model == 'llama2'):
-            # model = model.half().to('cuda')
-            # model.to(dtype=torch.bfloat16).to("cuda")
-            # pass
-        # else:
-            model.to('cuda')
+        model.to('cuda')
 
     # mask_token = tokenizer.mask_token
     mask_token = tokenizer.mask_token if tokenizer.mask_token else "<unk>"  # Placeholder if needed
+    if(args.lm_model == 'llama3'):
+        mask_token = "<|reserved_special_token_0|>"
+
     log_softmax = torch.nn.LogSoftmax(dim=0)
     vocab = tokenizer.get_vocab()
     with open(args.lm_model + ".vocab", "w") as f:

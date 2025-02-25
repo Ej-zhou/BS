@@ -3,8 +3,8 @@
 # ------------------------------RUN MULTIPLE------------------------------
 # Define the input files
 # INPUT_FILES=("en.csv" "zh.csv" "ru.csv" "th.csv" "id.csv")  # Add your actual filenames here
-INPUT_FILES=("zh.csv" "ru.csv" "th.csv" "id.csv")  # Add your actual filenames here
-LM_MODEL="bloom"  # Options: bert, roberta, albert 
+INPUT_FILES=("en.csv" )  # Add your actual filenames here
+LM_MODEL="llama3"  # Options: bert, roberta, albert 
 OUTPUT_DIR="output/${LM_MODEL}" # Define output directory
 
  

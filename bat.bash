@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -w ltl-gpu05
-#SBATCH --time=10:00:00
+#SBATCH --time=20:00:00
 
 
 #! Optionally modify the environment seen by the application
