@@ -12,9 +12,12 @@ import pandas as pd
 from transformers import BertTokenizer, BertForMaskedLM
 from transformers import AlbertTokenizer, AlbertForMaskedLM
 from transformers import RobertaTokenizer, RobertaForMaskedLM
-# from transformers import AutoTokenizer, AutoModelForMaskedLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import XLMRobertaTokenizer, XLMRobertaModel
+from transformers import LlamaForCausalLM, LlamaTokenizer
 from collections import defaultdict
 from tqdm import tqdm
+import gc
 
 def read_data(input_file):
     """
@@ -54,6 +57,8 @@ def get_log_prob_unigram(masked_token_ids, token_ids, mask_idx, lm):
     """
     Given a sequence of token ids, with one masked token, return the log probability of the masked token.
     """
+    if(args.lm_model == 'llama2'):
+        return get_log_prob_unigram_causal(masked_token_ids, mask_idx, lm)
     
     model = lm["model"]
     tokenizer = lm["tokenizer"]
@@ -71,6 +76,35 @@ def get_log_prob_unigram(masked_token_ids, token_ids, mask_idx, lm):
 
     hs = hidden_states[mask_idx]
     target_id = token_ids[0][mask_idx]
+    log_probs = log_softmax(hs)[target_id]
+
+    return log_probs
+
+def get_log_prob_unigram_causal(token_ids, mask_idx, lm):
+    """
+    Given a sequence of token ids, return the log probability of a specific token
+    at position `mask_idx` using a causal language model.
+    """
+    
+    model = lm["model"]
+    tokenizer = lm["tokenizer"]
+    log_softmax = lm["log_softmax"]
+
+    # Ensure model is in evaluation mode
+    model.eval()
+
+    # Input sequence without the masked token
+    input_ids = token_ids.clone()  # Avoid modifying original
+    unk_token_id = tokenizer.unk_token_id
+    input_ids[0][mask_idx] = unk_token_id  # Replaces with <unk>
+
+    with torch.no_grad():
+        output = model(input_ids)
+        logits = output.logits.squeeze(0)  # Shape: [seq_len, vocab_size]
+
+    # Get log probabilities
+    hs = logits[mask_idx - 1]  # Predicting next token (causal)
+    target_id = token_ids[0][mask_idx]  # True token at mask_idx
     log_probs = log_softmax(hs)[target_id]
 
     return log_probs
@@ -165,6 +199,9 @@ def evaluate(args):
     Evaluate a masked language model using CrowS-Pairs dataset.
     """
 
+    gc.collect()
+    torch.cuda.empty_cache()
+
     print("Evaluating:")
     print("Input:", args.input_file)
     print("Model:", args.lm_model)
@@ -194,14 +231,34 @@ def evaluate(args):
         uncased = False
     elif args.lm_model == "xlm-roberta":
         tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
-        model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-base")
+        # model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-base")
+        model = AutoModelForCausalLM.from_pretrained("xlm-roberta-base")
+        # tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
+        # model = XLMRobertaModel.from_pretrained("xlm-roberta-base")
+        uncased = False
+    elif args.lm_model == 'llama2':
+        # Load model directly
+        torch.cuda.empty_cache()
+        tokenizer = LlamaTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", use_auth_token=True)
+        # model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", use_auth_token=True, device_map="auto", torch_dtype=torch.float16)
+        model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", use_auth_token=True, device_map = "auto")
+        uncased = False
+    elif args.lm_model == 'bloom':
+        tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-560m")
+        model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-560m")
         uncased = False
 
     model.eval()
     if torch.cuda.is_available():
-        model.to('cuda')
+        # if(args.lm_model == 'llama2'):
+            # model = model.half().to('cuda')
+            # model.to(dtype=torch.bfloat16).to("cuda")
+            # pass
+        # else:
+            model.to('cuda')
 
-    mask_token = tokenizer.mask_token
+    # mask_token = tokenizer.mask_token
+    mask_token = tokenizer.mask_token if tokenizer.mask_token else "<unk>"  # Placeholder if needed
     log_softmax = torch.nn.LogSoftmax(dim=0)
     vocab = tokenizer.get_vocab()
     with open(args.lm_model + ".vocab", "w") as f:
