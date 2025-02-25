@@ -22,13 +22,14 @@ def compute_bias_score(sent_more_score, sent_less_score):
     if (abs(sent_more_score) + abs(sent_less_score) == 0):
         return 1
     else:
-        return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2)
+        return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2) *100
 
 # Initialize a list to store the data
 all_data = []
 
 # Process only XLM-RoBERTa model
 dataset_dir = "xlm-roberta"  # Folder name
+
 
 # Loop through each language file
 for lang in languages:
@@ -44,32 +45,51 @@ for lang in languages:
         for _, row in df.iterrows():
             all_data.append([language_names[lang], row["bias_type"], row["bias_score"]])
 
-
 # Convert to a DataFrame
 df_plot = pd.DataFrame(all_data, columns=["Language", "Bias Type", "Bias Score"])
 
-# Combine Language and Bias Type for the x-axis
-df_plot["Language_Bias"] = df_plot["Language"] + " (" + df_plot["Bias Type"] + ")"
-
-# Set up the figure
-plt.figure(figsize=(14, 6))
-
-# Create the violin plot
-sns.violinplot(
-    data=df_plot,
-    x="Language_Bias",
-    y="Bias Score",
-    hue="Language",  # Ensures each language has the same color
-    palette="Set2",  # Adjust color scheme
-    inner="quart"
+# Set up the violin plot using sns.catplot
+g = sns.catplot(
+    data=df_plot, 
+    x="Bias Score", 
+    y="Bias Type", 
+    hue="Language", 
+    kind="bar", 
+    height= 6,
+    aspect = 1.2
+    # bw_adjust=0.5, 
+    # cut=0, 
+    # split=True,
+    # aspect=2
 )
 
 # Improve the plot aesthetics
-plt.xticks(rotation=45, ha="right")
-plt.xlabel("Language (Bias Type)")
-plt.ylabel("Bias Score")
-plt.title("Bias Score Distribution Across Languages and Bias Types")
-plt.legend(title="Language", loc="upper right")
+g.set_axis_labels("Bias Score", "Bias Type")
+g.fig.suptitle("Bias Score Distribution by Bias Type Across Languages in XLM-RoBERTa", fontsize=10)
+
+# g.set(xlim=(0, 0.2))
+# # Combine Language and Bias Type for the x-axis
+# df_plot["Language_Bias"] = df_plot["Language"] + " (" + df_plot["Bias Type"] + ")"
+
+# # Set up the figure
+# plt.figure(figsize=(14, 10))
+
+# # Create the violin plot
+# sns.violinplot(
+#     data=df_plot,
+#     x="Language_Bias",
+#     y="Bias Score",
+#     hue="Language",  # Ensures each language has the same color
+#     palette="Set2",  # Adjust color scheme
+#     inner="quart"
+# )
+
+# # Improve the plot aesthetics
+# plt.xticks(rotation=45, ha="right")
+# plt.xlabel("Language (Bias Type)")
+# plt.ylabel("Bias Score")
+# plt.title("Bias Score Distribution Across Languages and Bias Types")
+# plt.legend(title="Language", loc="upper right")
 
     # Save the plot
 output_dir = "xlm-roberta_plots"

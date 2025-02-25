@@ -21,13 +21,13 @@ def compute_bias_score(sent_more_score, sent_less_score):
     if (abs(sent_more_score) + abs(sent_less_score) == 0):
         return 1
     else:
-        return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2)
+        return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2) * 100
 
 # Initialize a dictionary to store results
 all_results = {}
 
 # Process only XLM-RoBERTa model
-dataset_dir = "xlm-roberta"  # Folder name
+dataset_dir = "xglm"  # Folder name
 
 # Loop through each language file
 for lang in languages:
@@ -67,6 +67,8 @@ def plot_radar_chart(results):
     ax.set_title("Bias Scores for XLM-RoBERTa Across Languages")
     ax.legend(loc="upper right")
     
+    ax.set_ylim(0.5, 4)
+
     # Save the plot
     output_dir = "xlm-roberta_plots"
     os.makedirs(output_dir, exist_ok=True)
