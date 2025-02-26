@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Define models and files to process
-models = ["mbert", "xlm-roberta", "xglm" , "bloom",  "qwen", "llama2"]
+models = ["mbert", "xlm-roberta", "xglm" , "bloom",  "qwen", "llama2","llama3"]
 languages = ["en", "zh", "ru", "id", "th"]
 bias_types = ["gender", "nationality", "race-color", "religion"]
 
@@ -13,7 +13,8 @@ model_names = {
     "bloom": "BLOOM",
     "llama2": "LLaMA 2",
     "qwen": "Qwen 2.5",
-    "xglm": "XGLM"
+    "xglm": "XGLM",
+    "llama3": "LLaMA 3"
 }
 
 # Dictionary for proper language names
