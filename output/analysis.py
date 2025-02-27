@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Define models and files to process
-models = ["mbert", "xlm-roberta", "xglm" , "bloom",  "qwen", "llama2","llama3"]
+models = ["mbert", "xlm-roberta", "xglm" , "bloom",  "qwen", "llama3"]
 languages = ["en", "zh", "ru", "id", "th"]
 bias_types = ["gender", "nationality", "race-color", "religion"]
 
@@ -14,7 +14,8 @@ model_names = {
     "llama2": "LLaMA 2",
     "qwen": "Qwen 2.5",
     "xglm": "XGLM",
-    "llama3": "LLaMA 3"
+    "llama3": "LLaMA 3",
+    "nllb": "NLLB-200"
 }
 
 # Dictionary for proper language names
@@ -120,6 +121,7 @@ for model in models:
 #----------------------with average----------------------
         # Generate LaTeX table
 latex_code = "\\begin{table*}\n"
+latex_code += "    \\small\n"
 latex_code += "    \\centering\n"
 latex_code += "    \\begin{tabular}{l l " + "c" * len(models) + "}\n"
 latex_code += "        \\hline\n"

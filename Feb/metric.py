@@ -15,6 +15,7 @@ from transformers import RobertaTokenizer, RobertaForMaskedLM
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import XLMRobertaTokenizer, XLMRobertaModel
 from transformers import LlamaForCausalLM, LlamaTokenizer
+from transformers import AutoModelForSeq2SeqLM
 from collections import defaultdict
 from tqdm import tqdm
 import gc
@@ -57,7 +58,7 @@ def get_log_prob_unigram(masked_token_ids, token_ids, mask_idx, lm):
     """
     Given a sequence of token ids, with one masked token, return the log probability of the masked token.
     """
-    if(args.lm_model == 'llama2'):
+    if(args.lm_model == 'llama2' or args.lm_model == 'qwen'):
         return get_log_prob_unigram_causal(masked_token_ids, mask_idx, lm)
     
     model = lm["model"]
@@ -95,7 +96,7 @@ def get_log_prob_unigram_causal(token_ids, mask_idx, lm):
 
     # Input sequence without the masked token
     input_ids = token_ids.clone()  # Avoid modifying original
-    unk_token_id = tokenizer.unk_token_id
+    unk_token_id = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
     input_ids[0][mask_idx] = unk_token_id  # Replaces with <unk>
 
     with torch.no_grad():
@@ -254,12 +255,20 @@ def evaluate(args):
         model = AutoModelForCausalLM.from_pretrained("facebook/xglm-564M")
         uncased = False
     elif args.lm_model == 'qwen':
-        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B", pad_token = '<|pad|>')
         model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B")
         uncased = False
     elif args.lm_model == 'llama3':
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B")
         model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B")
+        uncased = False
+    elif args.lm_model == 'nllb':
+        tokenizer = AutoTokenizer.from_pretrained("facebook/nllb-200-3.3B")
+        model = AutoModelForSeq2SeqLM.from_pretrained("facebook/nllb-200-3.3B")     
+        uncased = False
+    elif args.lm_model == 'mbart':
+        tokenizer = AutoTokenizer.from_pretrained("facebook/mbart-large-50")
+        model = AutoModelForSeq2SeqLM.from_pretrained("facebook/mbart-large-50")
         uncased = False
     
     model.eval()
@@ -270,6 +279,10 @@ def evaluate(args):
     mask_token = tokenizer.mask_token if tokenizer.mask_token else "<unk>"  # Placeholder if needed
     if(args.lm_model == 'llama3'):
         mask_token = "<|reserved_special_token_0|>"
+    if(args.lm_model == 'nllb'):
+        mask_token = "<unk>"
+    if(args.lm_model == 'qwen'):
+        mask_token ='<|pad|>'
 
     log_softmax = torch.nn.LogSoftmax(dim=0)
     vocab = tokenizer.get_vocab()

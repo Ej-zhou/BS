@@ -69,7 +69,8 @@ def plot_bias_distribution(df_plot, figsize=(12, 6), output_dir="xlm-roberta_plo
         # legend=False
     )
 
-    g.set_axis_labels("","log-scaled Bias Score")
+    g.set_titles(col_template="{col_name}", size=14) 
+    g.set_axis_labels("","log-scaled Bias Score", size=14)
     # plt.tight_layout() 
 
     for ax in g.axes.flat:
@@ -86,5 +87,5 @@ def plot_bias_distribution(df_plot, figsize=(12, 6), output_dir="xlm-roberta_plo
 
 # Main execution
 if __name__ == "__main__":
-    df_plot = load_data("llama2")
+    df_plot = load_data("bloom")
     plot_bias_distribution(df_plot, figsize=(25, 7))  # Adjust figsize as needed
