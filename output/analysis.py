@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Define models and files to process
-models = ["mbert", "xlm-roberta", "xglm" , "bloom",  "qwen", "llama3"]
+models = ["mbert", "xlm-roberta", "xglm"  ,"gemma", "qwen", "llama3", ]
 languages = ["en", "zh", "ru", "id", "th"]
 bias_types = ["gender", "nationality", "race-color", "religion"]
 
@@ -15,7 +15,8 @@ model_names = {
     "qwen": "Qwen 2.5",
     "xglm": "XGLM",
     "llama3": "LLaMA 3",
-    "nllb": "NLLB-200"
+    "nllb": "NLLB-200",
+    "gemma": "Gemma"
 }
 
 # Dictionary for proper language names
@@ -30,11 +31,12 @@ language_names = {
 
 
 # Function to compute the bias score
-def compute_bias_score(sent_more_score, sent_less_score):
+def compute_bias_score(sent_more_score, sent_less_score, overall_mean_sent_score):
     if (abs(sent_more_score) + abs(sent_less_score) == 0):
         return 1
     else:
-        return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2)
+        # return abs(sent_more_score - sent_less_score) / ((abs(sent_more_score) + abs(sent_less_score)) / 2)
+        return abs(sent_more_score - sent_less_score) / overall_mean_sent_score * 10
 
 # Initialize a dictionary to store results
 all_results = {}
@@ -42,6 +44,20 @@ all_results = {}
 # Loop through each model
 for model in models:
     model_dir = model  # Each model has its own folder
+
+    for lang in languages:
+        file_path = os.path.join(model_dir, f"{lang}.csv")
+        mean_sent_scores = []
+
+        if os.path.exists(file_path):  # Check if the file exists
+            df = pd.read_csv(file_path)
+
+            mean_sent_score = df[["sent_more_score", "sent_less_score"]].mean().mean()
+            mean_sent_scores.append(mean_sent_score)
+            
+    
+    overall_mean_sent_score = - sum(mean_sent_scores) / len(mean_sent_scores) if mean_sent_scores else "N/A"
+    print(f"Overall mean_sent_score for {model}: {overall_mean_sent_score}")
 
     # Loop through each language file
     for lang in languages:
@@ -51,7 +67,7 @@ for model in models:
             df = pd.read_csv(file_path)
 
             # Compute bias score for each row
-            df["bias_score"] = df.apply(lambda row: compute_bias_score(row["sent_more_score"], row["sent_less_score"]), axis=1)
+            df["bias_score"] = df.apply(lambda row: compute_bias_score(row["sent_more_score"], row["sent_less_score"], overall_mean_sent_score), axis=1)
 
             # Compute average bias score per bias type
             bias_avg_scores = df.groupby("bias_type")["bias_score"].mean().to_dict()
@@ -70,6 +86,8 @@ for model in models:
 
         # Store the results
         all_results[(model, lang)] = bias_avg_scores
+
+    
 
 #----------------------without average----------------------
 #         # Generate LaTeX table
@@ -147,9 +165,9 @@ for lang in languages:
             score = all_results.get((model, lang), {}).get(bias, "N/A")
             if isinstance(score, float):
                 if bias == "average":
-                    row.append(f"\\textbf{{{score*100:.3f}}}")  # Bold the average values
+                    row.append(f"\\textbf{{{score*100:.2f}}}")  # Bold the average values
                 else:
-                    row.append(f"{score*100:.3f}")  # Convert to percentage
+                    row.append(f"{score*100:.2f}")  # Convert to percentage
             else:
                 if bias == "average":
                     row.append("\\textbf{N/A}")  # Keep bold N/A for average row

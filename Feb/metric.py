@@ -270,6 +270,10 @@ def evaluate(args):
         tokenizer = AutoTokenizer.from_pretrained("facebook/mbart-large-50")
         model = AutoModelForSeq2SeqLM.from_pretrained("facebook/mbart-large-50")
         uncased = False
+    elif args.lm_model == 'gemma':
+        tokenizer = AutoTokenizer.from_pretrained("google/gemma-3-1b-pt")
+        model = AutoModelForCausalLM.from_pretrained("google/gemma-3-1b-pt")
+        uncased = False
     
     model.eval()
     if torch.cuda.is_available():

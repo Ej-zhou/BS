@@ -4,7 +4,7 @@
 # Define the input files
 # INPUT_FILES=("en.csv" "zh.csv" "ru.csv" "th.csv" "id.csv")  # Add your actual filenames here
 INPUT_FILES=("en.csv" "zh.csv" "ru.csv" "th.csv" "id.csv")  # Add your actual filenames here
-LM_MODEL="mbart"  # Options: bert, roberta, albert 
+LM_MODEL="gemma"  # Options: bert, roberta, albert 
 OUTPUT_DIR="output/${LM_MODEL}" # Define output directory
 
  
